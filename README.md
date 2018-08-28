@@ -11,7 +11,7 @@
     </a>
 </p>
 
-## 本项目还在不断开发完善中,如有建议或问题请[在这里提出](https://gitee.com/ZhongBangKeJi/CRMEB/issues)
+## 本项目还在不断开发完善中,如有建议或问题请[在这里提出](https://github.com/sugar1569/CRMEB/issues)
 ## 项目介绍
    基于ThinkPhp5.0+Vue+EasyWeChat 开发的一套CRMEB新零售商城系统
     
@@ -109,7 +109,7 @@ Git clone https://gitee.com/ZhongBangKeJi/CRMEB.git
 
 QQ群: 116279623
 
-Gitee: https://gitee.com/ZhongBangKeJi/CRMEB/issues
+Gitee: https://github.com/sugar1569/CRMEB/issues
 
 ## 特别鸣谢
 感谢以下的项目,排名不分先后
