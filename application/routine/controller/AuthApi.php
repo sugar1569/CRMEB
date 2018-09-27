@@ -368,7 +368,7 @@ class AuthApi extends AuthController{
      */
     public function my(){
         $this->userInfo['couponCount'] = StoreCouponUser::getUserValidCouponCount($this->userInfo['uid']);
-        $this->userInfo['like'] = StoreProductRelation::getUserIdLike($this->userInfo['uid']);;
+        $this->userInfo['like'] = StoreProductRelation::getUserIdCollect($this->userInfo['uid']);;
         $this->userInfo['orderStatusNum'] = StoreOrder::getOrderStatusNum($this->userInfo['uid']);
         $this->userInfo['notice'] = UserNotice::getNotice($this->userInfo['uid']);
         $this->userInfo['statu'] = (int)SystemConfig::getValue('store_brokerage_statu');
@@ -802,6 +802,8 @@ class AuthApi extends AuthController{
     public function get_order($uni = ''){
         if($uni == '') return JsonService::fail('参数错误');
         $order = StoreOrder::getUserOrderDetail($this->userInfo['uid'],$uni);
+        $order = $order->toArray();
+        $order['add_time'] = date('Y-m-d H:i:s',$order['add_time']);
         if(!$order) return JsonService::fail('订单不存在');
         return JsonService::successful(StoreOrder::tidyOrder($order,true));
     }
@@ -1271,29 +1273,17 @@ class AuthApi extends AuthController{
             ->join('__STORE_ORDER__ B','A.link_id = B.id AND B.uid = '.$uid)->select()->toArray();
         return JsonService::successful($list);
     }
-    /*
-     * 申请提现
-     */
-//    public function user_extract()
-//    {
-//        if(UserExtract::userExtract($this->userInfo,UtilService::postMore([
-//            ['type','','','extract_type'],'real_name','alipay_code','bank_code','bank_address',['price','','','extract_price']
-//        ])))
-//            return JsonService::successful('申请提现成功!');
-//        else
-//            return JsonService::fail(Extract::getErrorInfo());
-//    }
+    
     public function user_extract()
     {   $request = Request::instance();
         $list=$request->param();
         $data=$list['lists'];
-//        dump($data);
-//        dump($this->userInfo);
         if(UserExtract::userExtract($this->userInfo,$data))
             return JsonService::successful('申请提现成功!');
         else
             return JsonService::fail(UserExtract::getErrorInfo());
     }
+
 /*
  * 提现列表
  */
@@ -1313,28 +1303,20 @@ class AuthApi extends AuthController{
      * @param int $first
      * @param int $limit
      */
-    public function subordinateOrderlist($first = 0, $limit = 8)
-    { $request = Request::instance();
+    public function subordinateOrderlist($first = 0, $limit = 8){
+        $request = Request::instance();
         $lists=$request->param();
-        $xuid=$lists['uid'];$status=$lists['status'];
-        if($status==0){
-            $type='';
-        }elseif($status==1){
-            $type=4;
-        }elseif($status==2){
-            $type=3;
-        }else{
-           return false;
-        }
-        if($xuid==0){
-            $arr=User::where('spread_uid',$this->userInfo['uid'])->column('uid');
-            foreach($arr as $v){
-
-                $list = StoreOrder::getUserOrderList($v,$type,$first,$limit);
-            }
-        }else{
-            $list = StoreOrder::getUserOrderList($xuid,$type,$first,$limit);
-        }
+        $xUid = $lists['uid'];
+        $status = $lists['status'];
+        if($status == 0) $type='';
+        elseif($status == 1) $type=4;
+        elseif($status == 2) $type=3;
+        else return false;
+        $list = [];
+        if(!$xUid){
+            $arr = User::where('spread_uid',$this->userInfo['uid'])->column('uid');
+            foreach($arr as $v) $list = StoreOrder::getUserOrderList($v,$type,$first,$limit);
+        }else $list = StoreOrder::getUserOrderList($xUid,$type,$first,$limit);
         foreach ($list as $k=>$order){
             $list[$k] = StoreOrder::tidyOrder($order,true);
             if($list[$k]['_status']['_type'] == 3){
@@ -1352,16 +1334,18 @@ class AuthApi extends AuthController{
      */
     public function subordinateOrderlistmoney()
     {
-        $arr=User::where('spread_uid',$this->userInfo['uid'])->column('uid');
-        foreach($arr as $v){
-            $list = StoreOrder::getUserOrderList($v,$type='');
-        }
-
-        foreach ($list as $k=>$v){
-            $arr[]=$v['pay_price'];
-        }
-        $cont=count($list);
-        $sum=array_sum($arr);
+        $request = Request::instance();
+        $lists=$request->param();
+        $status = $lists['status'];
+        $type = '';
+        if($status == 1) $type = 4;
+        elseif($status == 2) $type = 3;
+        $arr = User::where('spread_uid',$this->userInfo['uid'])->column('uid');
+        $list = StoreOrder::getUserOrderCount(implode(',',$arr),$type);
+        $price = [];
+        foreach ($list as $k=>$v) $price[]=$v['pay_price'];
+        $cont = count($list);
+        $sum = array_sum($price);
         return JsonService::successful(['cont'=>$cont,'sum'=>$sum]);
     }
     /*
@@ -1451,9 +1435,10 @@ class AuthApi extends AuthController{
         header('content-type:image/jpg');
         if(!$this->userInfo['uid']) return JsonService::fail('授权失败，请重新授权');
         $path = 'public/uploads/routine/'.$this->userInfo['uid'].'.jpg';
-        if(file_exists($path)) return JsonService::successful($path);
+        $domain=SystemConfigService::get('site_url').'/';
+        if(file_exists($path)) return JsonService::successful($domain.$path);
         else file_put_contents($path,RoutineCode::getCode($this->userInfo['uid']));
-        return JsonService::successful($path);
+        return JsonService::successful($domain.$path);
     }
 
     /**
@@ -1498,6 +1483,7 @@ class AuthApi extends AuthController{
     public function get_bargain($bargainId = 0){
         if(!$bargainId) return JsonService::fail('参数错误');
         $bargain = StoreBargain::getBargainTerm($bargainId);
+        if(empty($bargain)) return JsonService::fail('砍价已结束');
         $bargain['time'] = time();
         return JsonService::successful($bargain);
     }

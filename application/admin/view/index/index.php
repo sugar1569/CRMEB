@@ -26,11 +26,7 @@
                 <li class="nav-header">
                     <div class="dropdown profile-element admin_open">
                         <span>
-                            {if condition="$site_logo"}
-                            <img alt="image" class="imgbox" src="{$site_logo}"/>
-                            {else/}
-                            <img alt="image" class="" src="{__FRAME_PATH}img/profile_small.jpg" />
-                            {/if}
+                            <img alt="image" class="imgbox" src="{$site_logo}" onerror="javascript:this.src='{__ADMIN_PATH}images/admin_logo.png';"/>
                         </span>
                         <a data-toggle="dropdown" class="dropdown-toggle" href="#">
                             <span class="clear" style="margin-top: 20px;">
@@ -113,7 +109,7 @@
         </div>
         <!--底部版权-->
         <div class="footer"  @touchmove.prevent>
-            <div class="pull-right">&copy; 2014-2018 <a href="http://www.crmeb.com/" target="_blank">西安众邦科技</a>
+            <div class="pull-right">&copy; 2014-2018 <a href="http://www.crmeb.com/" target="_blank">CRMEB</a>
             </div>
         </div>
     </div>

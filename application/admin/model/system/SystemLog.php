@@ -98,4 +98,14 @@ class SystemLog extends ModelBasic
         $model = $model->order('l.id desc');
         return self::page($model,$where);
     }
+    /**
+     * @day
+     * 删除超过90天的日志
+     */
+    public static function deleteLog($day = 90){
+        $model = new self;
+        $times = $day*86400;
+        $model->where('add_time','<',time()-$times);
+        $model->delete();
+    }
 }

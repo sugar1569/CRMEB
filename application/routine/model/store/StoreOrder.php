@@ -21,6 +21,7 @@ use app\routine\model\user\UserBill;
 use app\routine\model\user\WechatUser;
 use basic\ModelBasic;
 use behavior\wap\StoreProductBehavior;
+use behavior\routine\StoreProductBehavior as StoreProductBehaviorRoutine;
 use behavior\wechat\PaymentBehavior;
 use service\HookService;
 use service\RoutineService;
@@ -515,7 +516,7 @@ class StoreOrder extends ModelBasic
         if(false !== self::edit(['status'=>2],$order['id'],'id') &&
             false !== StoreOrderStatus::status($order['id'],'user_take_delivery','用户已收货')){
             try{
-                HookService::listen('store_product_order_user_take_delivery',$order,$uid,false,StoreProductBehavior::class);
+                HookService::listen('store_product_order_user_take_delivery',$order,$uid,false,StoreProductBehaviorRoutine::class);
             }catch (\Exception $e){
                 return self::setErrorInfo($e->getMessage());
             }
@@ -643,6 +644,17 @@ class StoreOrder extends ModelBasic
         return $list;
     }
 
+    /**
+     * 获取推广人地下用户的订单金额
+     * @param string $uid
+     * @param string $status
+     * @return array
+     */
+    public static function getUserOrderCount($uid = '',$status = ''){
+        $res = self::statusByWhere($status)->where('uid','IN',$uid)->column('pay_price');
+        return $res;
+    }
+
     public static function searchUserOrder($uid,$order_id)
     {
         $order = self::where('uid',$uid)->where('order_id',$order_id)->where('is_del',0)->field('seckill_id,bargain_id,combination_id,id,order_id,pay_price,total_num,total_price,pay_postage,total_postage,paid,status,refund_status,pay_type,coupon_price,deduction_price,delivery_type')
@@ -680,7 +692,8 @@ class StoreOrder extends ModelBasic
         $noTake = self::where('uid',$uid)->where('paid',1)->where('is_del',0)->where('status',1)->where('pay_type','<>','offline')->count();
         $noReply = self::where('uid',$uid)->where('paid',1)->where('is_del',0)->where('status',2)->count();
         $noPink = self::where('o.uid',$uid)->alias('o')->join('StorePink p','o.pink_id = p.id')->where('p.status',1)->where('o.paid',1)->where('o.is_del',0)->where('o.status',0)->where('o.pay_type','<>','offline')->count();
-        return compact('noBuy','noPostage','noTake','noReply','noPink');
+        $noRefund = self::where('uid',$uid)->where('paid',1)->where('is_del',0)->where('refund_status','IN','1,2')->count();
+        return compact('noBuy','noPostage','noTake','noReply','noPink','noRefund');
     }
 
     public static function gainUserIntegral($order)
