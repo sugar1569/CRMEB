@@ -54,15 +54,15 @@
         </div>
         <div class="tabs-left">
             <ul class="nav nav-tabs">
-                <li {if condition="$pid eq 0" } class="active" {/if}><a href="{:Url('index',array('pid'=>0,'fodder'=>$Request.param.fodder))}">所有分类</a></li>
+                <li {if condition="$pid eq 0" } class="active" {/if}><a href="{:Url('index',array('pid'=>0,'fodder'=>$Request.param.fodder,'big'=>$Request.param.big))}">所有分类</a></li>
                 {volist name="$typearray" id="vo" key="k"}
                     {if condition="$vo.id eq $pid"}
-                     <li class="active"><a href="{:Url('index',array('pid'=>$vo.id,'fodder'=>$Request.param.fodder))}">{$vo.name}</a></li>
+                     <li class="active"><a href="{:Url('index',array('pid'=>$vo.id,'fodder'=>$Request.param.fodder,'big'=>$Request.param.big))}">{$vo.name}</a></li>
                 {else}
-                     <li ><a href="{:Url('index',array('pid'=>$vo.id,'fodder'=>$Request.param.fodder))}">{$vo.name}</a></li>
+                     <li ><a href="{:Url('index',array('pid'=>$vo.id,'fodder'=>$Request.param.fodder,'big'=>$Request.param.big))}">{$vo.name}</a></li>
                 {/if}
                 {volist name="$vo.child" id="voo" key="kk"}
-                       <li class="child {if condition="$voo.id eq $pid"} active{/if}"><a href="{:Url('index',array('pid'=>$voo.id,'fodder'=>$Request.param.fodder))}">-{$voo.name}</a></li>
+                       <li class="child {if condition="$voo.id eq $pid"} active{/if}"><a href="{:Url('index',array('pid'=>$voo.id,'fodder'=>$Request.param.fodder,'big'=>$Request.param.big))}">-{$voo.name}</a></li>
                     {/volist}
                 {/volist}
             </ul>
@@ -77,7 +77,11 @@
             {volist name="list" id="vo"}
             <div class="image-item">
                 <div class="image-delete" data-url="{:Url('delete',array('att_id'=>$vo.att_id))}"></div>
+                {if condition="$Request.param.big eq 1"}
                 <img class="pic" src="{$vo.att_dir|ltrim='.'}" id="{$vo.att_id}"/>
+                {else/}
+                <img class="pic" src="{$vo.satt_dir|ltrim='.'}" id="{$vo.att_id}"/>
+                {/if}
             </div>
             {/volist}
         </div>

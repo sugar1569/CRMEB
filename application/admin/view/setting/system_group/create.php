@@ -17,37 +17,47 @@
             <i-input v-model="formData.info" placeholder="请输入数据组简介"></i-input>
         </Form-Item>
         <Form-Item v-for="(item, index) in formData.typelist" :label="'字段' + (index+1)">
-            <row ref="typelist">
-                <i-col span="5">
-                    <Form-Item>
-                        <i-input :placeholder="item.name.placeholder" v-model="item.name.value"></i-input>
-                    </Form-Item>
+            <row type="flex" ref="typelist" align="middle">
+                <i-col span="10">
+                    <row>
+                        <i-col span="23">
+                            <Form-Item>
+                                <i-input :placeholder="item.name.placeholder" v-model="item.name.value"></i-input>
+                            </Form-Item>
+                        </i-col>
+                    </row>
+                    <row>
+                        <i-col span="23">
+                            <Form-Item>
+                                <i-input :placeholder="item.title.placeholder" v-model="item.title.value"></i-input>
+                            </Form-Item>
+                        </i-col>
+                    </row>
+                    <row>
+                        <i-col span="23">
+                            <Form-Item>
+                                <i-select :placeholder="item.type.placeholder" v-model="item.type.value">
+                                    <i-option value="input">文本框</i-option>
+                                    <i-option value="textarea">多行文本框</i-option>
+                                    <i-option value="radio">单选框</i-option>
+                                    <i-option value="checkbox">多选框</i-option>
+                                    <i-option value="select">下拉选择</i-option>
+                                    <i-option value="upload">单图</i-option>
+                                    <i-option value="uploads">多图</i-option>
+                                </i-select>
+                            </Form-Item>
+                        </i-col>
+                    </row>
                 </i-col>
-                <i-col span="5">
+                <i-col span="12">
                     <Form-Item>
-                        <i-input :placeholder="item.title.placeholder" v-model="item.title.value"></i-input>
-                    </Form-Item>
-                </i-col>
-                <i-col span="5">
-                    <Form-Item>
-                        <i-select :placeholder="item.type.placeholder" v-model="item.type.value">
-                            <i-option value="input">文本框</i-option>
-                            <i-option value="textarea">多行文本框</i-option>
-                            <i-option value="radio">单选框</i-option>
-                            <i-option value="checkbox">多选框</i-option>
-                            <i-option value="upload">单文件上传</i-option>
-                            <i-option value="uploads">多文件上传</i-option>
-                        </i-select>
-                    </Form-Item>
-                </i-col>
-                <i-col span="7">
-                    <Form-Item>
-                        <i-input :placeholder="item.param.placeholder" v-model="item.param.value"></i-input>
+                        <i-input type="textarea" rows="4" :placeholder="item.param.placeholder" v-model="item.param.value"></i-input>
                     </Form-Item>
                 </i-col>
                 <i-col span="2" style="display:inline-block; text-align:right;">
                     <i-button type="primary" icon="close-round" @click="removeType(index)"></i-button>
                 </i-col>
+            </row>
             </row>
         </Form-Item>
         <Form-Item><i-button type="primary" @click="addType">添加字段</i-button></Form-Item>
@@ -85,7 +95,7 @@
                             value: ''
                         },
                         param: {
-                            placeholder: "字段参数男-女",
+                            placeholder: "参数方式例如:\n1=白色\n2=红色\n3=黑色",
                             value: ''
                         }
                     })

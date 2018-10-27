@@ -47,7 +47,7 @@
 </div>
 <script>
    var base = new Base64();
-    requirejs(['vue','store','better-scroll','helper','wap/crmeb/module/store/shop-card'],function(Vue,storeApi,BScroll,$h,shopCard){
+    requirejs(['vue','store','better-scroll','helper','{__WAP_PATH}crmeb/module/store/shop-card.js'],function(Vue,storeApi,BScroll,$h,shopCard){
         shopCard.install(Vue);
         var cid = "{$cid}";
         new Vue({
@@ -158,7 +158,7 @@
                                 var checkedAttr = productValue[values.sort().join(',')];
                                 storeApi.setCart({
                                     cartNum:cartNum,
-                                    uniqueId:checkedAttr === undefined ? '' : checkedAttr.unique,
+                                    uniqueId:checkedAttr === undefined ? 0 : checkedAttr.unique,
                                     productId:product.id
                                 },function () {
                                     $h.pushMsg('加入购物车成功!');
@@ -169,7 +169,7 @@
                                 var checkedAttr = productValue[values.sort().join(',')];
                                 storeApi.goBuy({
                                     cartNum:cartNum,
-                                    uniqueId:checkedAttr === undefined ? '' : checkedAttr.unique,
+                                    uniqueId:checkedAttr === undefined ? 0 : checkedAttr.unique,
                                     productId:product.id
                                 },function(cartId){
                                     location.href = $h.U({
